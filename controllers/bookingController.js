@@ -64,12 +64,10 @@ exports.webhookCheckout = (req, res, next) => {
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
-    switch (event.type) {
-      case 'checkout.session.completed':
-        createBookingCheckout(event.data.object);
-        break;
-      default:
-        console.log(`Unhandled event type ${event.type}`);
+    if (event.type === 'checkout.session.completed') {
+      createBookingCheckout(event.data.object);
+    } else {
+      return res.status(400).send(`Webhook Error`);
     }
   }
 
