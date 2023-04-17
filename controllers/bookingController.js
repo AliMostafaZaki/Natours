@@ -61,13 +61,16 @@ exports.webhookCheckout = (req, res, next) => {
         process.env.STRIPE_WEBHOOK_SECRET
       );
     } catch (err) {
-      return res
-        .status(400)
-        .send(`⚠️  Webhook signature verification failed.`, err.message);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
-    if (event.type === 'checkout.session.completed')
-      createBookingCheckout(event.data.object);
+    switch (event.type) {
+      case 'checkout.session.completed':
+        createBookingCheckout(event.data.object);
+        break;
+      default:
+        console.log(`Unhandled event type ${event.type}`);
+    }
   }
 
   res.status(200).json({ received: true });
